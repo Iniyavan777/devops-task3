@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Clone') {
             steps {
-                git 'https://github.com/Iniyavan777/devops-task3.git'
+                git branch: 'main', url: 'https://github.com/Iniyavan777/devops-task3.git'
             }
         }
         stage('Build') {
@@ -20,6 +20,13 @@ pipeline {
             steps {
                 sh 'echo $DOCKERHUB_CREDS_PSW | docker login -u $DOCKERHUB_CREDS_USR --password-stdin'
                 sh 'docker push $DEV_IMAGE'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                sh 'docker stop devops-app || true'
+                sh 'docker rm devops-app || true'
+                sh 'docker run -d -p 80:80 --name devops-app $DEV_IMAGE'
             }
         }
     }
